@@ -1,0 +1,41 @@
+name: 'Auto Run'
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 12 * * 2'
+
+jobs:
+  update-and-release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Get data
+        run: |
+          CURRENT_DATE=$(date +'%Y-%m-%d')
+          echo "CURRENT_DATE=$CURRENT_DATE" >> $GITHUB_ENV
+
+      - name: Fetch file
+        run: |
+          if ! curl -s -o xyq_client_ver.js https://xyq.163.com/download/xyq_client_ver.js; then
+            echo "❌ Failed to fetch xyq_client_ver.js"
+            exit 1
+          fi
+          if ! curl -s -o mhxyxxsj_client_ver.js https://xyq.163.com/download/mhxyxxsj_client_ver.js; then
+            echo "❌ Failed to fetch mhxyxxsj_client_ver.js"
+            exit 1
+          fi
+
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: "${{ env.CURRENT_DATE }}"
+          name: "Release ${{ env.CURRENT_DATE }}"
+          body: "Automatically updated on ${{ env.CURRENT_DATE }}."
+          files: |
+            xyq_client_ver.js
+            mhxyxxsj_client_ver.js
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
