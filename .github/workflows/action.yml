@@ -12,7 +12,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Get data
+      - name: Get date
         run: |
           CURRENT_DATE=$(date +'%Y-%m-%d')
           echo "CURRENT_DATE=$CURRENT_DATE" >> $GITHUB_ENV
